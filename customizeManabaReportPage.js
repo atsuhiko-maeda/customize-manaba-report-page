@@ -1,5 +1,3 @@
-// localStorage.clear();
-
 // B-02 C-02 D-02 
 let SEAT_LIST =('E-02 F-02 G-02 H-02 L-02 M-02 N-02 O-02 ' +
         'B-04 C-04 D-04 E-04 F-04 G-04 H-04 L-04 M-04 N-04 O-04 ' +
@@ -84,11 +82,13 @@ function customizePage(hfd,list){
             if (mode==='E'){
                 const num = parseInt(str_num, 10)+1;
                 const digitCount = SETTING['ID_DIGIT']-str_num.length;
+                // console.log(num,digitCount);
                 return [num*Math.pow(10, digitCount)-1, Math.pow(10, SETTING['ID_DIGIT'])];
             }
             else{
                 const num = parseInt(str_num, 10);
                 const digitCount = SETTING['ID_DIGIT']-str_num.length;
+                // console.log(num,digitCount);
                 return [num*Math.pow(10, digitCount), Math.pow(10, SETTING['ID_DIGIT'])];
             }
         }
@@ -104,6 +104,7 @@ function customizePage(hfd,list){
         const id = parseInt(inner, 10);
         const idS = id % digitCountS;
         const idE = id % digitCountE;
+        // console.log(startNum,idS,idE,endNum);
         if ((startNum === null || startNum <= idS) && (endNum === null || idE <= endNum)){
             ;   
         }
