@@ -1,3 +1,4 @@
+javascript:(function(){
 // localStorage.clear();
 
 // B-02 C-02 D-02 
@@ -20,7 +21,6 @@ let SETTING = JSON.parse(localStorage.getItem("SETTING"))??  {
 const TIME_OUT=100;
 const DL_CHECK_INTERVAL=1000;
 let dl_check_interval_ID = 0;
-// let iframe_codes="";
 
 setTimeout(reload,0);
 
@@ -207,3 +207,4 @@ function input_handler(e){
 
     localStorage.setItem("SETTING",JSON.stringify(SETTING));
 }
+})();
