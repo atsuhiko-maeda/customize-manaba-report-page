@@ -9,7 +9,14 @@ manabaのレポートの「提出状況（個別に採点）」のページを�
 * 個々の学生の学籍番号の横に座席番号を付与（学籍番号順に座席を指定している授業を想定）。
 
 使い方：
-* 下記のURLをブックマークツールバーにドラッグしてください。
-  ** [customize-manaba-report-page](javascript:(function(d,s){  s=d.createElement('script');s.src='https://atsuhiko-maeda.github.io/customize-manaba-report-page/customizeManabaReportPage.js';d.body.appendChild(s);})(document))
-* その後は、manabaのレポートの「提出状況（個別に採点）」のページを開き、ブックマークをクリックすると、ページがカスタマイズされます。
-* ページをリロードすれば停止できます。
+### ブックマークレットのインストール方法
+
+1. 以下のコードを選択してコピーします。
+
+   ```javascript
+   javascript:(function(d,s){  s=d.createElement('script');s.src='https://atsuhiko-maeda.github.io/customize-manaba-report-page/customizeManabaReportPage.js';d.body.appendChild(s);})(document)
+
+2. ブラウザのブックマークバーに新しいブックマークを作成します。
+3. タイトルを好きな名前に設定し、URLまたはアドレスフィールドに先程コピーしたコードをペーストし、保存します。
+4. その後は、manabaのレポートの「提出状況（個別に採点）」のページを開き、ブックマークをクリックすると、ページがカスタマイズされます。
+5. ページをリロードすれば停止できます。
