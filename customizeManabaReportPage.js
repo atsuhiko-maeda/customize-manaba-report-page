@@ -82,18 +82,16 @@ function customizePage(hfd,list){
             if (mode==='E'){
                 const num = parseInt(str_num, 10)+1;
                 const digitCount = SETTING['ID_DIGIT']-str_num.length;
-                // console.log(num,digitCount);
                 return [num*Math.pow(10, digitCount)-1, Math.pow(10, SETTING['ID_DIGIT'])];
             }
             else{
                 const num = parseInt(str_num, 10);
                 const digitCount = SETTING['ID_DIGIT']-str_num.length;
-                // console.log(num,digitCount);
                 return [num*Math.pow(10, digitCount), Math.pow(10, SETTING['ID_DIGIT'])];
             }
         }
         else
-            return [parseInt(str_num, 10), SETTING['ID_DIGIT']];
+            return [parseInt(str_num, 10), Math.pow(10, SETTING['ID_DIGIT'])];
     };
     
     const [startNum, digitCountS] = extractNumber(SETTING['FIRST_NUM']);
