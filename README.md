@@ -10,5 +10,6 @@ manabaのレポートの「提出状況（個別に採点）」のページを�
 
 使い方：
 * 下記のURLをブックマークツールバーにドラッグしてください。
+  ** [customize-manaba-report-page](javascript:(function(d,s){  s=d.createElement('script');s.src='https://atsuhiko-maeda.github.io/customize-manaba-report-page/customizeManabaReportPage.js';d.body.appendChild(s);})(document))
 * その後は、manabaのレポートの「提出状況（個別に採点）」のページを開き、ブックマークをクリックすると、ページがカスタマイズされます。
 * ページをリロードすれば停止できます。
