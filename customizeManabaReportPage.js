@@ -1,4 +1,3 @@
-javascript:(function(){
 // localStorage.clear();
 
 // B-02 C-02 D-02 
@@ -207,4 +206,3 @@ function input_handler(e){
 
     localStorage.setItem("SETTING",JSON.stringify(SETTING));
 }
-})();
