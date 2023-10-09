@@ -1,11 +1,11 @@
-let SEAT_LIST =('E-02 F-02 G-02 H-02 L-02 M-02 N-02 O-02 ' +
+const SEAT_LIST =('E-02 F-02 G-02 H-02 L-02 M-02 N-02 O-02 ' +
         'B-04 C-04 D-04 E-04 F-04 G-04 H-04 L-04 M-04 N-04 O-04 ' +
         'B-07 C-07 D-07 E-07 F-07 G-07 H-07 L-07 M-07 N-07 O-07 ' +
         'B-08 C-08 D-08 E-08 F-08 G-08 H-08 L-08 M-08 N-08 O-08 ' +
         'B-11 C-11 D-11 E-11 F-11 G-11 H-11 L-11 M-11 N-11 O-11 ' +
         'D-12 E-12 F-12 G-12 H-12 L-12 M-12 N-12').split(' ');            
 
-let SETTING = JSON.parse(localStorage.getItem("SETTING"))??  {
+const SETTING = JSON.parse(localStorage.getItem("SETTING"))??  {
     'SEAT_LIST':SEAT_LIST,
     'SEAT_SHOW': false,
     'STUDENT_LEN':232,
@@ -17,6 +17,7 @@ let SETTING = JSON.parse(localStorage.getItem("SETTING"))??  {
 const TIME_OUT=100;
 const DL_CHECK_INTERVAL=1000;
 let dl_check_interval_ID = 0;
+let reload_timeout_ID = 0;
 
 setTimeout(reload,0);
 
@@ -28,7 +29,7 @@ function reload(){
                        '<iframe class="inner hidden" src="'+location.href+'"></iframe>';
         document.write(iframe_codes);
 
-        let style = document.createElement("style");
+        const style = document.createElement("style");
         style.innerHTML = `
           iframe.inner {
             width:100%;
@@ -44,6 +45,10 @@ function reload(){
             visibility: hidden;
           }`;
         document.head.appendChild(style);
+        window.onbeforeunload = function(){
+            clearTimeout(reload_timeout_ID);
+            clearInterval(dl_check_interval_ID);
+        };
     }
     else{
         hf.contentDocument.location.reload(true);
@@ -57,7 +62,7 @@ function pollingUntilReady(){
         return;
     }
 
-    let list = hf.contentDocument.getElementsByClassName("listcollection_td_left");
+    const list = hf.contentDocument.getElementsByClassName("listcollection_td_left");
     // console.log("# of members is "+list.length+".");
     if (list.length<SETTING['STUDENT_LEN'])
         return;
@@ -121,14 +126,14 @@ function customizePage(hfd,list){
     console.log("未提出:"+count+" "+"全員:"+list.length);
     const progress = Math.round((1-(count/list.length))*100);
 
-    let hidden_table = hfd.querySelector(".stdlist.sorttable");
-    let vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
-    let visible_table = vfd.querySelector(".stdlist.sorttable");
+    const hidden_table = hfd.querySelector(".stdlist.sorttable");
+    const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
+    const visible_table = vfd.querySelector(".stdlist.sorttable");
     visible_table.replaceWith(hidden_table);
 
     vfd.querySelectorAll("a").forEach(e=>e.setAttribute("target","_top"));
 
-    let progress_elem = vfd.querySelector("#progress");
+    const progress_elem = vfd.querySelector("#progress");
     if (progress_elem){
         progress_elem.innerHTML= progress;
     }
@@ -136,12 +141,12 @@ function customizePage(hfd,list){
         createUI(vfd, progress);
     }
 
-    setTimeout(reload,TIME_OUT);
+    reload_timeout_ID = setTimeout(reload,TIME_OUT);
 }
 
 function createUI(vfd,progress){
     console.log("createUI()");
-    let customized_div = document.createElement('div');
+    const customized_div = document.createElement('div');
     customized_div.innerHTML     = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
                                     "CUSTOMIZED"+
                                     "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -152,7 +157,7 @@ function createUI(vfd,progress){
                                     color:white`;
     vfd.body.appendChild(customized_div);
 
-    let div3 = document.createElement('div');
+    const div3 = document.createElement('div');
     div3.style.cssText = `position:fixed;
                           top:60;left:0;`;   
     vfd.body.appendChild(div3);
@@ -188,7 +193,7 @@ function createUI(vfd,progress){
     vfd.querySelector("#progress").innerHTML=progress;
 
     const inputs = vfd.querySelectorAll("#first_num, #last_num, #student_len, #seat_show, #seat_list");
-    for(let item of inputs){
+    for(const item of inputs){
         item.addEventListener("input", input_handler);
     }
 }
@@ -196,7 +201,7 @@ function createUI(vfd,progress){
 function input_handler(e){
     console.log("input_handler()");
 
-    let vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;    
+    const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;    
 
     SETTING['FIRST_NUM']=vfd.querySelector("#first_num").value;
     SETTING['LAST_NUM']=vfd.querySelector("#last_num").value;
