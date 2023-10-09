@@ -122,7 +122,8 @@ function customizePage(){
         progress_elem.innerHTML= progress;
     }
 
-    hfd.location.reload(true);
+        setTimeout(function(){
+    hfd.location.reload(true);},1000);
 }
 
 function createUI(){
