@@ -146,7 +146,7 @@ function createUI(){
                           top:60;left:0;`;   
     vfd.body.appendChild(div3);
     div3.innerHTML  =`<div>
-                        <label for="number">学籍番号の範囲(例:*12)* </label>
+                        <label for="number">学籍番号の範囲(例:*12) </label>
                         <input type="text" id="first_num" for="number" size="5" />〜
                         <input type="text" id="last_num" for="number" size="5" />
                     </div>
