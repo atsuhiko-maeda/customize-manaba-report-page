@@ -1,6 +1,8 @@
 # customize-manaba-report-page
 manabaのレポートの「提出状況（個別に採点）」のページをカスタマイズするブックマークレットです。
 
+<img src="https://github.com/atsuhiko-maeda/customize-manaba-report-page/blob/main/screenshot.png">
+
 ### できること:
 * 「提出状況（個別に採点）」のページをチラツキなく、一定間隔でリロードする（個々のレポートを採点後、一々リロードしなくてもよくなる）。
 * 学籍番号にフィルタをかけ、表示される範囲を限定する（複数の教員で採点を分担する場合などを想定）。
