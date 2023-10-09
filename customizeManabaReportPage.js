@@ -17,11 +17,11 @@ const SETTING = JSON.parse(localStorage.getItem(course_str+"_SETTING"))??  {
 init();
 
 function init(){
-    
-    document.write(
-        '<iframe class="inner" src="'+location.href+'"></iframe>'+
-        '<iframe class="inner hidden" src="'+location.href+'"></iframe>'        
-    );
+
+    const iframe_codes = '<iframe class="inner" src="'+location.href+'"></iframe>'+
+                        '<iframe class="inner hidden" src="'+location.href+'"></iframe>';
+
+    document.write(iframe_codes);
 
     const style = document.createElement("style");
     style.innerHTML = `
