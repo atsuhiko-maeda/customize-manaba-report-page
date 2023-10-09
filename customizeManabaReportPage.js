@@ -1,4 +1,3 @@
-// B-02 C-02 D-02 
 let SEAT_LIST =('E-02 F-02 G-02 H-02 L-02 M-02 N-02 O-02 ' +
         'B-04 C-04 D-04 E-04 F-04 G-04 H-04 L-04 M-04 N-04 O-04 ' +
         'B-07 C-07 D-07 E-07 F-07 G-07 H-07 L-07 M-07 N-07 O-07 ' +
@@ -126,6 +125,8 @@ function customizePage(hfd,list){
     let vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
     let visible_table = vfd.querySelector(".stdlist.sorttable");
     visible_table.replaceWith(hidden_table);
+
+    vfd.querySelectorAll("a").forEach(e=>e.setAttribute("target","_top"));
 
     let progress_elem = vfd.querySelector("#progress");
     if (progress_elem){
