@@ -122,8 +122,9 @@ function customizePage(){
         progress_elem.innerHTML= progress;
     }
 
-        setTimeout(function(){
-    hfd.location.reload(true);},1000);
+    setTimeout(function(){
+        hfd.location.reload(true);
+    },500);
 }
 
 function createUI(){
