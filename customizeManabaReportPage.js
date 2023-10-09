@@ -5,33 +5,27 @@ const SEAT_LIST =('E-02 F-02 G-02 H-02 L-02 M-02 N-02 O-02 ' +
         'B-11 C-11 D-11 E-11 F-11 G-11 H-11 L-11 M-11 N-11 O-11 ' +
         'D-12 E-12 F-12 G-12 H-12 L-12 M-12 N-12').split(' ');            
 
-const SETTING = JSON.parse(localStorage.getItem("SETTING"))??  {
-    'SEAT_LIST':SEAT_LIST,
-    'SEAT_SHOW': false,
-    'STUDENT_LEN':232,
-    'FIRST_NUM': "*105",
-    'LAST_NUM': "*156",
-    'ID_DIGIT':7
+const course_str = location.href.match(/.*course_\d+_/g);
+const SETTING = JSON.parse(localStorage.getItem(course_str+"_SETTING"))??  {
+    'SEAT_LIST':SEAT_LIST
+    ,'SEAT_SHOW': false
+    ,'STUDENT_LEN':232
+    ,'FIRST_NUM': "*105"
+    ,'LAST_NUM': "*156"
 };
 
-const TIME_OUT=100;
-const DL_CHECK_INTERVAL=1000;
-let dl_check_interval_ID = 0;
-let reload_timeout_ID = 0;
+init();
 
-setTimeout(reload,0);
+function init(){
+    
+    document.write(
+        '<iframe class="inner" src="'+location.href+'"></iframe>'+
+        '<iframe class="inner hidden" src="'+location.href+'"></iframe>'        
+    );
 
-function reload(){
-    console.log("reload()");
-    const hf = document.querySelector("iframe.inner.hidden");
-    if (hf===null){
-        const iframe_codes = '<iframe class="inner" src="'+location.href+'"></iframe>'+
-                       '<iframe class="inner hidden" src="'+location.href+'"></iframe>';
-        document.write(iframe_codes);
-
-        const style = document.createElement("style");
-        style.innerHTML = `
-          iframe.inner {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        iframe.inner {
             width:100%;
             height:100%;
             position:absolute;
@@ -40,44 +34,35 @@ function reload(){
             border: 4px #32CD32 solid; 
 
             visibility: visible;
-          }
-          .inner.hidden {
+        }
+        .inner.hidden {
             visibility: hidden;
-          }`;
-        document.head.appendChild(style);
-        window.onbeforeunload = function(){
-            clearTimeout(reload_timeout_ID);
-            clearInterval(dl_check_interval_ID);
-        };
-    }
-    else{
-        hf.contentDocument.location.reload(true);
-    }
-    dl_check_interval_ID = setInterval(pollingUntilReady, DL_CHECK_INTERVAL);
+        }`;
+    document.head.appendChild(style);
+
+    document.querySelector("iframe.inner:not(.hidden)").addEventListener(
+        'load',function(){createUI();
+    });
+
+    document.querySelector("iframe.inner.hidden").addEventListener(
+        'load',function(){customizePage();
+    });
 }
 
-function pollingUntilReady(){
-    const hf = document.querySelector("iframe.inner.hidden");
-    if (hf === null || hf.contentDocument == null) {
-        return;
-    }
-
-    const list = hf.contentDocument.getElementsByClassName("listcollection_td_left");
-    // console.log("# of members is "+list.length+".");
-    if (list.length<SETTING['STUDENT_LEN'])
-        return;
-
-    clearInterval(dl_check_interval_ID);
-    customizePage(hf.contentDocument,list);
-}
-
-function customizePage(hfd,list){
+function customizePage(){
+    console.log("hidden frame was loaded.");
     console.log("customizePage()");
+    const hfd = document.querySelector("iframe.inner.hidden").contentDocument;
+    const list = hfd.getElementsByClassName("listcollection_td_left");
+    console.log("# of members is "+list.length+".");
+   
+    const ID_DIGIT =  list[0].innerText.length;
+    // console.log("ID_DIGIT="+ID_DIGIT);
 
     const extractNumber = (pattern,mode) => {
         const str_num = pattern.replace('*', '');
         if (str_num === '')
-            return [null, SETTING['ID_DIGIT']+1];
+            return [null, ID_DIGIT+1];
         else if (pattern.startsWith('*')){
             const digitCount = str_num.length;
             return [parseInt(str_num, 10), Math.pow(10, digitCount)];
@@ -85,17 +70,17 @@ function customizePage(hfd,list){
         else if (pattern.endsWith('*')){
             if (mode==='E'){
                 const num = parseInt(str_num, 10)+1;
-                const digitCount = SETTING['ID_DIGIT']-str_num.length;
-                return [num*Math.pow(10, digitCount)-1, Math.pow(10, SETTING['ID_DIGIT'])];
+                const digitCount = ID_DIGIT-str_num.length;
+                return [num*Math.pow(10, digitCount)-1, Math.pow(10, ID_DIGIT)];
             }
             else{
                 const num = parseInt(str_num, 10);
-                const digitCount = SETTING['ID_DIGIT']-str_num.length;
-                return [num*Math.pow(10, digitCount), Math.pow(10, SETTING['ID_DIGIT'])];
+                const digitCount = ID_DIGIT-str_num.length;
+                return [num*Math.pow(10, digitCount), Math.pow(10, ID_DIGIT)];
             }
         }
         else
-            return [parseInt(str_num, 10), Math.pow(10, SETTING['ID_DIGIT'])];
+            return [parseInt(str_num, 10), Math.pow(10, ID_DIGIT)];
     };
     
     const [startNum, digitCountS] = extractNumber(SETTING['FIRST_NUM']);
@@ -137,15 +122,14 @@ function customizePage(hfd,list){
     if (progress_elem){
         progress_elem.innerHTML= progress;
     }
-    else{
-        createUI(vfd, progress);
-    }
 
-    reload_timeout_ID = setTimeout(reload,TIME_OUT);
+    hfd.location.reload(true);
 }
 
-function createUI(vfd,progress){
+function createUI(){
     console.log("createUI()");
+    const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
+
     const customized_div = document.createElement('div');
     customized_div.innerHTML     = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
                                     "CUSTOMIZED"+
@@ -166,10 +150,6 @@ function createUI(vfd,progress){
                         <input type="text" id="first_num" for="number" size="5" />〜
                         <input type="text" id="last_num" for="number" size="5" />
                     </div>
-                    <div>
-                        <label for="student_len">履修者数: </label>
-                        <input type="text" id="student_len" for="student_len" size="5" />
-                    </div>
                     <fieldset>
                         <legend>座席番号</legend>
                         <div>
@@ -187,12 +167,11 @@ function createUI(vfd,progress){
 
     vfd.querySelector("#first_num").value=SETTING['FIRST_NUM'];
     vfd.querySelector("#last_num").value=SETTING['LAST_NUM'];
-    vfd.querySelector("#student_len").value=SETTING['STUDENT_LEN'];
     vfd.querySelector("#seat_list").value=SETTING['SEAT_LIST'];
     vfd.querySelector("#seat_show").checked=SETTING['SEAT_SHOW'];
-    vfd.querySelector("#progress").innerHTML=progress;
+    vfd.querySelector("#progress").innerHTML="";
 
-    const inputs = vfd.querySelectorAll("#first_num, #last_num, #student_len, #seat_show, #seat_list");
+    const inputs = vfd.querySelectorAll("#first_num, #last_num,#seat_show, #seat_list");// #student_len, 
     for(const item of inputs){
         item.addEventListener("input", input_handler);
     }
@@ -205,9 +184,8 @@ function input_handler(e){
 
     SETTING['FIRST_NUM']=vfd.querySelector("#first_num").value;
     SETTING['LAST_NUM']=vfd.querySelector("#last_num").value;
-    SETTING['STUDENT_LEN']=parseInt(vfd.querySelector("#student_len").value);
     SETTING['SEAT_LIST']=vfd.querySelector("#seat_list").value.split(",");
     SETTING['SEAT_SHOW']=vfd.querySelector("#seat_show").checked;
 
-    localStorage.setItem("SETTING",JSON.stringify(SETTING));
+    localStorage.setItem(course_str+"_SETTING",JSON.stringify(SETTING));
 }
