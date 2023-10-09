@@ -14,7 +14,7 @@ manabaのレポートの「提出状況（個別に採点）」のページを�
 1. 以下のコードを選択してコピーします。
 
    ```javascript
-   javascript:(function(d,s){  s=d.createElement('script');s.src='https://atsuhiko-maeda.github.io/customize-manaba-report-page/customizeManabaReportPage.js';d.body.appendChild(s);})(document)
+   javascript:(function(d){s=d.createElement('script');s.src='https://atsuhiko-maeda.github.io/customize-manaba-report-page/customizeManabaReportPage.js';d.body.appendChild(s);})(document)
 
 2. ブラウザのブックマークバーに新しいブックマークを作成します。
 3. タイトルを好きな名前に設定し、URLまたはアドレスフィールドに先程コピーしたコードをペーストし、保存します。
