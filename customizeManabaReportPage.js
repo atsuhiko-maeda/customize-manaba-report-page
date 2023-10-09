@@ -15,14 +15,14 @@ const SETTING = JSON.parse(localStorage.getItem(course_str+"_SETTING"))??  {
 };
 
 setTimeout(init,0);
-//init();
 
 function init(){
 
-    const iframe_codes = '<iframe class="inner" src="'+location.href+'"></iframe>'+
-                        '<iframe class="inner hidden" src="'+location.href+'"></iframe>';
-
-    document.write(iframe_codes);
+    document.write(
+        '<iframe class="inner" src="'+location.href+'"></iframe>'+
+        '<iframe class="inner hidden" src="'+location.href+'"></iframe>'
+    );
+    document.close();
 
     const style = document.createElement("style");
     style.innerHTML = `
@@ -55,10 +55,8 @@ function customizePage(){
     console.log("customizePage()");
     const hfd = document.querySelector("iframe.inner.hidden").contentDocument;
     const list = hfd.getElementsByClassName("listcollection_td_left");
-    console.log("# of members is "+list.length+".");
    
     const ID_DIGIT =  list[0].innerText.length;
-    // console.log("ID_DIGIT="+ID_DIGIT);
 
     const extractNumber = (pattern,mode) => {
         const str_num = pattern.replace('*', '');
@@ -172,7 +170,7 @@ function createUI(){
     vfd.querySelector("#seat_show").checked=SETTING['SEAT_SHOW'];
     vfd.querySelector("#progress").innerHTML="";
 
-    const inputs = vfd.querySelectorAll("#first_num, #last_num,#seat_show, #seat_list");// #student_len, 
+    const inputs = vfd.querySelectorAll("#first_num, #last_num, #seat_show, #seat_list");
     for(const item of inputs){
         item.addEventListener("input", input_handler);
     }
