@@ -14,8 +14,8 @@ const SETTING = JSON.parse(localStorage.getItem(course_str+"_SETTING"))??  {
     ,'LAST_NUM': "*156"
 };
 
-//setTimeout(init,1000);
-init();
+setTimeout(init,0);
+//init();
 
 function init(){
 
