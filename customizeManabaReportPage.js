@@ -9,7 +9,7 @@ const course_str = location.href.match(/.*course_\d+_/g);
 const SETTING = JSON.parse(localStorage.getItem(course_str+"_SETTING"))??  {
     'SEAT_LIST':SEAT_LIST
     ,'SEAT_SHOW': false
-    ,'STUDENT_LEN':232
+    ,'PASSING_MARK':2
     ,'FIRST_NUM': "*105"
     ,'LAST_NUM': "*156"
 };
@@ -105,6 +105,28 @@ function customizePage(){
         }  
     }
 
+    let unscored_submitted=0;
+    let onepoint_submitted=0;
+    for (let i=0 ; i<list.length ; i++){
+        // console.log(
+        //     list[i].innerText,
+        //     list[i].nextElementSibling.innerText,                
+        //     list[i].nextElementSibling.nextElementSibling.innerText
+        // );
+        let score = list[i].nextElementSibling.innerText;
+        const submitted =
+            (list[i].nextElementSibling.nextElementSibling.innerText.indexOf('未提出')===-1)?
+            true:false;
+
+        if (score.indexOf('-')>=0 && submitted)
+            unscored_submitted+=1;
+        if (score.indexOf('点')>=0 && parseInt(score.replace("点",""))<SETTING['PASSING_MARK'] && submitted)
+            onepoint_submitted+=1;
+    }
+
+    console.log('unscored_submitted=',unscored_submitted);
+    console.log('onepoint_submitted=',onepoint_submitted);
+
     const body_text = hfd.body.innerText;
     const count = ( body_text.match( /未提出/g ) || [] ).length ;
     console.log("未提出:"+count+" "+"全員:"+list.length);
@@ -121,10 +143,20 @@ function customizePage(){
     if (progress_elem){
         progress_elem.innerHTML= progress;
     }
+    const unscored_elem = vfd.querySelector("#unscored");
+    if (unscored_elem){
+        unscored_elem.innerHTML= unscored_submitted;
+    }
+    const onepoint_elem = vfd.querySelector("#onepoint");
+    if (onepoint_elem){
+        onepoint_elem.innerHTML= onepoint_submitted;
+    }
+
 
     setTimeout(function(){
         hfd.location.reload(true);
     },500);
+    // hfd.location.reload(true);
 }
 
 function createUI(){
@@ -151,6 +183,10 @@ function createUI(){
                         <input type="text" id="first_num" for="number" size="5" />〜
                         <input type="text" id="last_num" for="number" size="5" />
                     </div>
+                    <div>
+                    <label for="number2">合格点</label>
+                    <input type="text" id="passing_mark" for="number2" size="5" />
+                    </div>                    
                     <fieldset>
                         <legend>座席番号</legend>
                         <div>
@@ -162,17 +198,26 @@ function createUI(){
                             <textarea id="seat_list" name="seat_list" type="text" row="1" cols="20" style="background-color: white;"/></textarea>
                         <div>
                     </fieldset>
-                    <div style="position:fixed;font-size:10vw;top:50;left:0;opacity:80%;color:#32CD32;">
+                    <div style="font-size:10vw;opacity:80%;color:#32CD32;">
                         <span id="progress"></span><span style="font-size:2vw">%提出</span>
-                    </div>`;
+                    </div>                                        
+                    <div style="font-size:10vw;;opacity:80%;color:#32CD32;">
+                        <span id="unscored"></span><span style="font-size:2vw">未採点</span>
+                    </div>
+                    <div style="font-size:10vw;;opacity:80%;color:#32CD32;">
+                        <span id="onepoint"></span><span style="font-size:2vw">再提出</span>
+                    </div>
+
+                    `;
 
     vfd.querySelector("#first_num").value=SETTING['FIRST_NUM'];
     vfd.querySelector("#last_num").value=SETTING['LAST_NUM'];
     vfd.querySelector("#seat_list").value=SETTING['SEAT_LIST'];
     vfd.querySelector("#seat_show").checked=SETTING['SEAT_SHOW'];
+    vfd.querySelector("#passing_mark").value=SETTING['PASSING_MARK'];
     vfd.querySelector("#progress").innerHTML="";
 
-    const inputs = vfd.querySelectorAll("#first_num, #last_num, #seat_show, #seat_list");
+    const inputs = vfd.querySelectorAll("#first_num, #last_num, #seat_show, #seat_list, #passing_mark");
     for(const item of inputs){
         item.addEventListener("input", input_handler);
     }
@@ -187,6 +232,7 @@ function input_handler(e){
     SETTING['LAST_NUM']=vfd.querySelector("#last_num").value;
     SETTING['SEAT_LIST']=vfd.querySelector("#seat_list").value.split(",");
     SETTING['SEAT_SHOW']=vfd.querySelector("#seat_show").checked;
+    SETTING['PASSING_MARK']=vfd.querySelector("#passing_mark").value;
 
     localStorage.setItem(course_str+"_SETTING",JSON.stringify(SETTING));
 }
