@@ -106,7 +106,7 @@ function customizePage(){
     }
 
     let unscored_submitted=0;
-    let onepoint_submitted=0;
+    let resubmit_submitted=0;
     for (let i=0 ; i<list.length ; i++){
         // console.log(
         //     list[i].innerText,
@@ -121,11 +121,11 @@ function customizePage(){
         if (score.indexOf('-')>=0 && submitted)
             unscored_submitted+=1;
         if (score.indexOf('点')>=0 && parseInt(score.replace("点",""))<SETTING['PASSING_MARK'] && submitted)
-            onepoint_submitted+=1;
+            resubmit_submitted+=1;
     }
 
     console.log('unscored_submitted=',unscored_submitted);
-    console.log('onepoint_submitted=',onepoint_submitted);
+    console.log('resubmit_submitted=',resubmit_submitted);
 
     const body_text = hfd.body.innerText;
     const count = ( body_text.match( /未提出/g ) || [] ).length ;
@@ -147,11 +147,16 @@ function customizePage(){
     if (unscored_elem){
         unscored_elem.innerHTML= unscored_submitted;
     }
-    const onepoint_elem = vfd.querySelector("#onepoint");
-    if (onepoint_elem){
-        onepoint_elem.innerHTML= onepoint_submitted;
+    const resubmit_elem = vfd.querySelector("#resubmit");
+    if (resubmit_elem){
+        resubmit_elem.innerHTML= resubmit_submitted;
     }
 
+    if (progress_elem && unscored_elem && resubmit_elem){
+        // const t = vfd.querySelector(".contentbody-l table tbody th").innerText;
+        document.title = "提出率:"+progress+"% 未採点:"+unscored_submitted+" 再提出:" +resubmit_submitted;
+        // console.log(t);
+    }
 
     setTimeout(function(){
         hfd.location.reload(true);
@@ -205,7 +210,7 @@ function createUI(){
                         <span id="unscored"></span><span style="font-size:2vw">未採点</span>
                     </div>
                     <div style="font-size:10vw;;opacity:80%;color:#32CD32;">
-                        <span id="onepoint"></span><span style="font-size:2vw">再提出</span>
+                        <span id="resubmit"></span><span style="font-size:2vw">再提出</span>
                     </div>
 
                     `;
