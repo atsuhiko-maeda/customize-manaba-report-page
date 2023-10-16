@@ -55,10 +55,15 @@ function init(){
 function customizePage(){
     console.log("hidden frame was loaded.");
     console.log("customizePage()");
+
     const hfd = document.querySelector("iframe.inner.hidden").contentDocument;
-    const list = hfd.getElementsByClassName("listcollection_td_left");
-   
-    const ID_DIGIT =  list[0].innerText.length;
+    const hfd_table = hfd.querySelector(".stdlist.sorttable");
+    const hfd_list = hfd.getElementsByClassName("listcollection_td_left");
+    const ID_DIGIT =  hfd_list[0].innerText.length;
+
+    const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
+    const vfd_table = vfd.querySelector(".stdlist.sorttable");
+    const vfd_list = vfd.getElementsByClassName("listcollection_td_left");
 
     const extractNumber = (pattern,mode) => {
         const str_num = pattern.replace('*', '');
@@ -87,33 +92,34 @@ function customizePage(){
     const [startNum, digitCountS] = extractNumber(SETTING['FIRST_NUM']);
     const [endNum, digitCountE] = extractNumber(SETTING['LAST_NUM'],'E');
 
-    const id_tr_dict={};
-    for (let i=list.length-1 ; i>=0 ; i--){
-        const inner = list[i].innerText;
+    for (let i=hfd_list.length-1 ; i>=0 ; i--){
+        const inner = hfd_list[i].innerText;
         const id = parseInt(inner, 10);
         const idS = id % digitCountS;
         const idE = id % digitCountE;
         // console.log(startNum,idS,idE,endNum);
         if ((startNum === null || startNum <= idS) && (endNum === null || idE <= endNum)){
-            id_tr_dict[inner]=list[i];
+            ;
         }
         else {
-            list[i].parentNode.remove();
+            hfd_list[i].parentNode.remove();
         }
     }
 
     if (SETTING['SEAT_SHOW']){
-        for (let i=0 ; i<list.length && i<SEAT_LIST.length ; i++){
-               list[i].innerText=list[i].innerText+" ("+SETTING['SEAT_LIST'][i]+")";
-        }  
+        for (let i=0 ; i<hfd_list.length && i<SEAT_LIST.length ; i++)
+            hfd_list[i].innerText=hfd_list[i].innerText+" ("+SETTING['SEAT_LIST'][i]+")";
     }
+
+
+
 
     let submitted_unscored=0;
     let resubmitted=0;
-    for (let i=0 ; i<list.length ; i++){
-        let score = list[i].nextElementSibling.innerText;
+    for(const e of hfd_list){
+        let score = e.nextElementSibling.innerText;
         const submitted =
-            (list[i].nextElementSibling.nextElementSibling.innerText.indexOf('未提出')===-1)?
+            (e.nextElementSibling.nextElementSibling.innerText.indexOf('未提出')===-1)?
             true:false;
 
         if (score.indexOf('-')>=0 && submitted)
@@ -122,47 +128,41 @@ function customizePage(){
             resubmitted+=1;
     }
 
-    // console.log('submitted_unscored=',submitted_unscored);
-    // console.log('resubmitted=',resubmitted);
+    const count = ( hfd_table.innerText.match( /未提出/g ) || [] ).length ;
+    const progress = Math.round((1-(count/hfd_list.length))*100);
+    vfd.querySelector("#progress").innerHTML= progress;
+    vfd.querySelector("#unscored").innerHTML= submitted_unscored;
+    vfd.querySelector("#resubmit").innerHTML= resubmitted;
+    document.title = "提出率:"+progress+"% 未採点:"+submitted_unscored+" 再提出:" +resubmitted;
 
-    const hidden_table = hfd.querySelector(".stdlist.sorttable");
-    const body_text = hidden_table.innerText;
-    const count = ( body_text.match( /未提出/g ) || [] ).length ;
-    console.log("未提出:"+count+" "+"全員:"+list.length);
-    const progress = Math.round((1-(count/list.length))*100);
+    console.log("未提出:"+count+" "+"全員:"+hfd_list.length);
 
-    const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
+
+
+
     if (replaceAllFlag){
-        const visible_table = vfd.querySelector(".stdlist.sorttable");
-        visible_table.replaceWith(hidden_table);
+        vfd_table.replaceWith(hfd_table);
         replaceAllFlag=false;
     }
     else {
-        const vfd_list = vfd.getElementsByClassName("listcollection_td_left");
-        for (let i=0 ; i<vfd_list.length ; i++){
-            if (vfd_list[i].innerText in id_tr_dict)
-            vfd_list[i].replaceWith(id_tr_dict[vfd_list[i].innerText]);
-        }    
-    }
+        const id_tr_dict={};
+        for(const e of hfd_list)
+            id_tr_dict[e.innerText] = e.parentNode;
 
+        for(const e of vfd_list){
+            if (e.innerText in id_tr_dict){
+                e.parentNode.replaceWith(id_tr_dict[e.innerText]);
+                // console.log(e.innerText+" in id_tr_dict");
+            }
+            // else{
+            //     console.log(e.innerText+" not in id_tr_dict");
+            // }
+        }
+    }
     vfd.querySelectorAll("a").forEach(e=>e.setAttribute("target","_top"));
 
-    const progress_elem = vfd.querySelector("#progress");
-    if (progress_elem){
-        progress_elem.innerHTML= progress;
-    }
-    const unscored_elem = vfd.querySelector("#unscored");
-    if (unscored_elem){
-        unscored_elem.innerHTML= submitted_unscored;
-    }
-    const resubmit_elem = vfd.querySelector("#resubmit");
-    if (resubmit_elem){
-        resubmit_elem.innerHTML= resubmitted;
-    }
 
-    if (progress_elem && unscored_elem && resubmit_elem){
-        document.title = "提出率:"+progress+"% 未採点:"+submitted_unscored+" 再提出:" +resubmitted;
-    }
+
 
     setTimeout(function(){
         hfd.location.reload(true);
