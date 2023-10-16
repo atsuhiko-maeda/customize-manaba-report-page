@@ -14,6 +14,8 @@ const SETTING = JSON.parse(localStorage.getItem(course_str+"_SETTING"))??  {
     ,'LAST_NUM': "*156"
 };
 
+let replaceAllFlag=true;
+
 setTimeout(init,0);
 
 function init(){
@@ -85,6 +87,7 @@ function customizePage(){
     const [startNum, digitCountS] = extractNumber(SETTING['FIRST_NUM']);
     const [endNum, digitCountE] = extractNumber(SETTING['LAST_NUM'],'E');
 
+    const id_tr_dict={};
     for (let i=list.length-1 ; i>=0 ; i--){
         const inner = list[i].innerText;
         const id = parseInt(inner, 10);
@@ -92,7 +95,7 @@ function customizePage(){
         const idE = id % digitCountE;
         // console.log(startNum,idS,idE,endNum);
         if ((startNum === null || startNum <= idS) && (endNum === null || idE <= endNum)){
-            ;   
+            id_tr_dict[inner]=list[i];
         }
         else {
             list[i].parentNode.remove();
@@ -105,37 +108,42 @@ function customizePage(){
         }  
     }
 
-    let unscored_submitted=0;
-    let resubmit_submitted=0;
+    let submitted_unscored=0;
+    let resubmitted=0;
     for (let i=0 ; i<list.length ; i++){
-        // console.log(
-        //     list[i].innerText,
-        //     list[i].nextElementSibling.innerText,                
-        //     list[i].nextElementSibling.nextElementSibling.innerText
-        // );
         let score = list[i].nextElementSibling.innerText;
         const submitted =
             (list[i].nextElementSibling.nextElementSibling.innerText.indexOf('未提出')===-1)?
             true:false;
 
         if (score.indexOf('-')>=0 && submitted)
-            unscored_submitted+=1;
+            submitted_unscored+=1;
         if (score.indexOf('点')>=0 && parseInt(score.replace("点",""))<SETTING['PASSING_MARK'] && submitted)
-            resubmit_submitted+=1;
+            resubmitted+=1;
     }
 
-    console.log('unscored_submitted=',unscored_submitted);
-    console.log('resubmit_submitted=',resubmit_submitted);
+    // console.log('submitted_unscored=',submitted_unscored);
+    // console.log('resubmitted=',resubmitted);
 
-    const body_text = hfd.body.innerText;
+    const hidden_table = hfd.querySelector(".stdlist.sorttable");
+    const body_text = hidden_table.innerText;
     const count = ( body_text.match( /未提出/g ) || [] ).length ;
     console.log("未提出:"+count+" "+"全員:"+list.length);
     const progress = Math.round((1-(count/list.length))*100);
 
-    const hidden_table = hfd.querySelector(".stdlist.sorttable");
     const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
-    const visible_table = vfd.querySelector(".stdlist.sorttable");
-    visible_table.replaceWith(hidden_table);
+    if (replaceAllFlag){
+        const visible_table = vfd.querySelector(".stdlist.sorttable");
+        visible_table.replaceWith(hidden_table);
+        replaceAllFlag=false;
+    }
+    else {
+        const vfd_list = vfd.getElementsByClassName("listcollection_td_left");
+        for (let i=0 ; i<vfd_list.length ; i++){
+            if (vfd_list[i].innerText in id_tr_dict)
+            vfd_list[i].replaceWith(id_tr_dict[vfd_list[i].innerText]);
+        }    
+    }
 
     vfd.querySelectorAll("a").forEach(e=>e.setAttribute("target","_top"));
 
@@ -145,17 +153,15 @@ function customizePage(){
     }
     const unscored_elem = vfd.querySelector("#unscored");
     if (unscored_elem){
-        unscored_elem.innerHTML= unscored_submitted;
+        unscored_elem.innerHTML= submitted_unscored;
     }
     const resubmit_elem = vfd.querySelector("#resubmit");
     if (resubmit_elem){
-        resubmit_elem.innerHTML= resubmit_submitted;
+        resubmit_elem.innerHTML= resubmitted;
     }
 
     if (progress_elem && unscored_elem && resubmit_elem){
-        // const t = vfd.querySelector(".contentbody-l table tbody th").innerText;
-        document.title = "提出率:"+progress+"% 未採点:"+unscored_submitted+" 再提出:" +resubmit_submitted;
-        // console.log(t);
+        document.title = "提出率:"+progress+"% 未採点:"+submitted_unscored+" 再提出:" +resubmitted;
     }
 
     setTimeout(function(){
@@ -240,4 +246,6 @@ function input_handler(e){
     SETTING['PASSING_MARK']=vfd.querySelector("#passing_mark").value;
 
     localStorage.setItem(course_str+"_SETTING",JSON.stringify(SETTING));
+
+    replaceAllFlag=true;
 }
