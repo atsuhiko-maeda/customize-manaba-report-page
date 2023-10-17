@@ -201,13 +201,13 @@ function createUI(){
                             <textarea id="seat_list" name="seat_list" type="text" row="1" cols="20" style="background-color: white;"/></textarea>
                         <div>
                     </fieldset>
-                    <div style="font-size:10vw;opacity:80%;color:#32CD32;">
+                    <div style="font-size:8vw;opacity:80%;color:#32CD32;">
                         <span id="progress"></span><span style="font-size:2vw">%提出</span>
                     </div>                                        
-                    <div style="font-size:10vw;;opacity:80%;color:#32CD32;">
+                    <div style="font-size:8vw;;opacity:80%;color:#32CD32;">
                         <span id="unscored"></span><span style="font-size:2vw">未採点</span>
                     </div>
-                    <div style="font-size:10vw;;opacity:80%;color:#32CD32;">
+                    <div style="font-size:8vw;;opacity:80%;color:#32CD32;">
                         <span id="resubmit"></span><span style="font-size:2vw">再提出</span>
                     </div>
                     `;
