@@ -20,34 +20,31 @@ setTimeout(init,0);
 
 function init(){
 
-    document.write(
-        '<iframe class="inner" src="'+location.href+'"></iframe>'+
-        '<iframe class="inner hidden" src="'+location.href+'"></iframe>'
-    );
-    document.close();
-
-    const style = document.createElement("style");
-    style.innerHTML = `
-        iframe.inner {
+    const _style = document.createElement("style");
+    _style.innerHTML = `
+        iframe.hidden_iframe {
             width:100%;
             height:100%;
             position:absolute;
-            top:0;
-            left:0;
-            border: 4px #32CD32 solid; 
-
-            visibility: visible;
-        }
-        .inner.hidden {
+            top:0px;
+            left:0px;
             visibility: hidden;
+        }
+        .body_border {
+            border: 4px #32CD32 solid; 
         }`;
-    document.head.appendChild(style);
+    document.head.appendChild(_style);
 
-    document.querySelector("iframe.inner:not(.hidden)").addEventListener(
-        'load',function(){createUI();
-    });
+    document.body.classList.add('body_border');
 
-    document.querySelector("iframe.inner.hidden").addEventListener(
+    const iframe = document.createElement('iframe');
+    iframe.classList.add('hidden_iframe');
+    iframe.src = location.href;
+    document.body.appendChild(iframe);
+
+    createUI();
+
+    document.querySelector("iframe.hidden_iframe").addEventListener(
         'load',function(){customizePage();
     });
 }
@@ -56,12 +53,12 @@ function customizePage(){
     console.log("hidden frame was loaded.");
     console.log("customizePage()");
 
-    const hfd = document.querySelector("iframe.inner.hidden").contentDocument;
+    const hfd = document.querySelector("iframe.hidden_iframe").contentDocument;
     const hfd_table = hfd.querySelector(".stdlist.sorttable");
     const hfd_list = hfd.getElementsByClassName("listcollection_td_left");
     const ID_DIGIT =  hfd_list[0].innerText.length;
 
-    const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
+    const vfd = document;
     const vfd_table = vfd.querySelector(".stdlist.sorttable");
     const vfd_list = vfd.getElementsByClassName("listcollection_td_left");
 
@@ -152,14 +149,9 @@ function customizePage(){
         for(const e of vfd_list){
             if (e.innerText in id_tr_dict){
                 e.parentNode.replaceWith(id_tr_dict[e.innerText]);
-                // console.log(e.innerText+" in id_tr_dict");
             }
-            // else{
-            //     console.log(e.innerText+" not in id_tr_dict");
-            // }
         }
     }
-    vfd.querySelectorAll("a").forEach(e=>e.setAttribute("target","_top"));
 
 
 
@@ -172,25 +164,25 @@ function customizePage(){
 
 function createUI(){
     console.log("createUI()");
-    const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;
 
     const customized_div = document.createElement('div');
     customized_div.innerHTML     = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
                                     "CUSTOMIZED"+
                                     "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     customized_div.style.cssText = `position:fixed;
-                                    top:10;left:-15;
+                                    top:10px;left:-15px;
+                                    z-index:1;
                                     transform: rotate(-25deg);
                                     background-color: #32CD32;
                                     color:white`;
-    vfd.body.appendChild(customized_div);
+                                    document.body.appendChild(customized_div);
 
     const div3 = document.createElement('div');
-    div3.style.cssText = `position:fixed;
-                          top:60;left:0;`;   
-    vfd.body.appendChild(div3);
+    div3.style.cssText = `position:fixed;z-index:1;
+                          top:60px;left:0px;`;   
+                          document.body.appendChild(div3);
     div3.innerHTML  =`<div>
-                        <label for="number">学籍番号の範囲(例:*12) </label>
+                        <label for="number">学籍番号の範囲</label>
                         <input type="text" id="first_num" for="number" size="5" />〜
                         <input type="text" id="last_num" for="number" size="5" />
                     </div>
@@ -218,17 +210,16 @@ function createUI(){
                     <div style="font-size:10vw;;opacity:80%;color:#32CD32;">
                         <span id="resubmit"></span><span style="font-size:2vw">再提出</span>
                     </div>
-
                     `;
 
-    vfd.querySelector("#first_num").value=SETTING['FIRST_NUM'];
-    vfd.querySelector("#last_num").value=SETTING['LAST_NUM'];
-    vfd.querySelector("#seat_list").value=SETTING['SEAT_LIST'];
-    vfd.querySelector("#seat_show").checked=SETTING['SEAT_SHOW'];
-    vfd.querySelector("#passing_mark").value=SETTING['PASSING_MARK'];
-    vfd.querySelector("#progress").innerHTML="";
+                    document.querySelector("#first_num").value=SETTING['FIRST_NUM'];
+                    document.querySelector("#last_num").value=SETTING['LAST_NUM'];
+                    document.querySelector("#seat_list").value=SETTING['SEAT_LIST'];
+                    document.querySelector("#seat_show").checked=SETTING['SEAT_SHOW'];
+                    document.querySelector("#passing_mark").value=SETTING['PASSING_MARK'];
+                    document.querySelector("#progress").innerHTML="";
 
-    const inputs = vfd.querySelectorAll("#first_num, #last_num, #seat_show, #seat_list, #passing_mark");
+    const inputs = document.querySelectorAll("#first_num, #last_num, #seat_show, #seat_list, #passing_mark");
     for(const item of inputs){
         item.addEventListener("input", input_handler);
     }
@@ -237,13 +228,11 @@ function createUI(){
 function input_handler(e){
     console.log("input_handler()");
 
-    const vfd = document.querySelector("iframe.inner:not(.hidden)").contentDocument;    
-
-    SETTING['FIRST_NUM']=vfd.querySelector("#first_num").value;
-    SETTING['LAST_NUM']=vfd.querySelector("#last_num").value;
-    SETTING['SEAT_LIST']=vfd.querySelector("#seat_list").value.split(",");
-    SETTING['SEAT_SHOW']=vfd.querySelector("#seat_show").checked;
-    SETTING['PASSING_MARK']=vfd.querySelector("#passing_mark").value;
+    SETTING['FIRST_NUM']=document.querySelector("#first_num").value;
+    SETTING['LAST_NUM']=document.querySelector("#last_num").value;
+    SETTING['SEAT_LIST']=document.querySelector("#seat_list").value.split(",");
+    SETTING['SEAT_SHOW']=document.querySelector("#seat_show").checked;
+    SETTING['PASSING_MARK']=document.querySelector("#passing_mark").value;
 
     localStorage.setItem(course_str+"_SETTING",JSON.stringify(SETTING));
 
