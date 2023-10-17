@@ -179,7 +179,7 @@ function createUI(){
 
     const div3 = document.createElement('div');
     div3.style.cssText = `position:fixed;z-index:1;
-                          top:60px;left:0px;`;   
+                          top:60px;left:5px;`;   
                           document.body.appendChild(div3);
     div3.innerHTML  =`<div>
                         <label for="number">学籍番号の範囲</label>
